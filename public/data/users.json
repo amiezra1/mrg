@@ -1,0 +1,45 @@
+{
+  "users": [
+    {
+      "username": "admin",
+      "password": "admin123",
+      "displayName": "מנהל מערכת",
+      "role": "admin",
+      "permissions": [
+        "view",
+        "add",
+        "delete",
+        "editRoot"
+      ]
+    },
+    {
+      "username": "contributor",
+      "password": "cont123",
+      "displayName": "משתמש תורם",
+      "role": "contributor",
+      "permissions": [
+        "view",
+        "add",
+        "delete"
+      ]
+    },
+    {
+      "username": "viewer",
+      "password": "view123",
+      "displayName": "משתמש צופה",
+      "role": "viewer",
+      "permissions": [
+        "view"
+      ]
+    }
+  ],
+  "sharePointMapping": {
+    "owners": "admin",
+    "מנהלי מערכת": "admin",
+    "contributors": "contributor",
+    "תורמים": "contributor",
+    "members": "contributor",
+    "viewers": "viewer",
+    "צופים": "viewer"
+  }
+}

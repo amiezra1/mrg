@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/l_masha.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="מערכת ניהול קבצים - מרכז גיוס פיקוד דרום" />
+  <title>מרכז גיוס פיקוד דרום</title>
+  <style>
+    /* סגנון בסיסי לפני טעינת ה-CSS העיקרי */
+    body {
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      background-color: #121212;
+      color: white;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+
+    .spinner {
+      border: 5px solid rgba(255, 255, 255, 0.2);
+      border-top: 5px solid #228be6;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>עליך לאפשר JavaScript כדי להריץ את האפליקציה הזו.</noscript>
+  <div id="root">
+    <!-- אנימציית טעינה שתוצג עד שהאפליקציה תטען -->
+    <div class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">טוען...</div>
+    </div>
+  </div>
+</body>
+
+</html>
