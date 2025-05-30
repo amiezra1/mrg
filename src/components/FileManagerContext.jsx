@@ -1,5 +1,5 @@
-// FileManagerContext.jsx - גרסה פשוטה
-import React, { createContext, useState, useContext, useEffect } from 'react';
+// FileManagerContext.jsx - גרסה מתוקנת
+import React, { createContext, useState, useContext, useEffect, useRef, useCallback } from 'react';
 import { sharePointService } from '../services/sharepoint';
 import { permissionsService } from '../services/permissions';
 
@@ -12,6 +12,7 @@ export function FileManagerProvider({ children }) {
   });
 
   const [loading, setLoading] = useState(true);
+  const loadedFoldersRef = useRef(new Set()); // מעקב אחר תיקיות שכבר נטענו
 
   // טעינת נתונים התחלתיים
   useEffect(() => {
@@ -65,7 +66,7 @@ export function FileManagerProvider({ children }) {
   }, []);
 
   // פונקציה לקבלת מידע על תיקייה
-  const getFolderInfo = (folderId) => {
+  const getFolderInfo = useCallback((folderId) => {
     if (!folderId) return {
       backgroundImage: '/background.png',
       folderIcon: '/Folder.png',
@@ -103,7 +104,7 @@ export function FileManagerProvider({ children }) {
       folderIcon: '/Folder.png',
       name: folderId
     };
-  };
+  }, [folders]);
 
   // פונקציה ליצירת תיקייה חדשה
   const createFolder = async (parentId, folderName) => {
@@ -165,15 +166,23 @@ export function FileManagerProvider({ children }) {
     }
   };
 
-  // פונקציה לקבלת תכולת תיקייה
-  const getFolderContents = async (folderId) => {
+  // פונקציה לקבלת תכולת תיקייה - מתוקן למניעת לולאה אינסופית
+  const getFolderContents = useCallback(async (folderId) => {
     try {
       // אם יש כבר נתונים בזיכרון, השתמש בהם
       if (folders[folderId] && folders[folderId].length > 0) {
         return folders[folderId];
       }
 
-      // אחרת, טען מהשרת
+      // בדיקה אם כבר בתהליך טעינה של תיקייה זו
+      if (loadedFoldersRef.current.has(folderId)) {
+        return folders[folderId] || [];
+      }
+
+      // סימון שהתיקייה בתהליך טעינה
+      loadedFoldersRef.current.add(folderId);
+
+      // טען מהשרת
       const contents = await sharePointService.getFolderContents(folderId);
 
       // עדכון המצב המקומי
@@ -186,11 +195,16 @@ export function FileManagerProvider({ children }) {
     } catch (error) {
       console.error(`Error fetching folder contents for ${folderId}:`, error);
       return [];
+    } finally {
+      // במקרה של עדכון עתידי, נסיר את הסימון
+      setTimeout(() => {
+        loadedFoldersRef.current.delete(folderId);
+      }, 5000);
     }
-  };
+  }, [folders]);
 
   // פונקציה לקבלת כל התיקיות הראשיות
-  const getRootFolders = () => {
+  const getRootFolders = useCallback(() => {
     // וידוא שמחזירים תמיד משהו, גם אם הזיכרון ריק
     if (!folders.root || folders.root.length === 0) {
       console.log('Root folders are empty, returning default folders');
@@ -205,7 +219,7 @@ export function FileManagerProvider({ children }) {
     }
 
     return folders.root;
-  };
+  }, [folders.root]);
 
   // פונקציה למחיקת פריט
   const deleteItem = async (itemId, parentId, itemType) => {
@@ -273,7 +287,7 @@ export function FileManagerProvider({ children }) {
     return await permissionsService.checkPermission(permission);
   };
 
-  // ערך להעברה ל-Context
+  // ערך להעברה ל-Context - מתוקן לשימוש ב-useCallback
   const value = {
     folders,
     loading,
